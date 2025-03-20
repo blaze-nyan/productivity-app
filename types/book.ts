@@ -1,14 +1,33 @@
 export type Book = {
-  id: string
-  title: string
-  author: string
-  type: "physical" | "ebook" | "audiobook" | "pdf" | "link"
-  category: string
-  status: "to-read" | "reading" | "completed" | "reference"
-  rating?: number
-  notes?: string
-  link?: string
-  coverImage?: string
-  dateAdded: Date
-}
+  id: string;
+  title: string;
+  author: string | null;
+  description: string | null;
+  status: "to-read" | "reading" | "completed";
+  rating: number | null;
+  notes: string | null;
+  startDate: Date | null;
+  endDate: Date | null;
+  coverImage: string | null;
+  isbn: string | null;
+  pageCount: number | null;
+  genre: string | null;
+  userId: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
+export type BookFormData = {
+  title: string;
+  author?: string;
+  description?: string;
+  status: "to-read" | "reading" | "completed";
+  rating?: number;
+  notes?: string;
+  startDate?: Date | null;
+  endDate?: Date | null;
+  coverImage?: string;
+  isbn?: string;
+  pageCount?: number;
+  genre?: string;
+};

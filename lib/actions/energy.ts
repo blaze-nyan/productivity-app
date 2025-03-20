@@ -1,15 +1,15 @@
-"use server"
+"use server";
 
-import { revalidatePath } from "next/cache"
-import { getServerSession } from "next-auth/next"
-import { authOptions } from "@/lib/auth"
-import prisma from "@/lib/db"
+import { revalidatePath } from "next/cache";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
+import prisma from "@/lib/db";
 
 export async function getEnergyLogs() {
-  const session = await getServerSession(authOptions)
+  const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    throw new Error("You must be logged in to view energy logs")
+    throw new Error("You must be logged in to view energy logs");
   }
 
   const logs = await prisma.energyLog.findMany({
@@ -19,21 +19,21 @@ export async function getEnergyLogs() {
     orderBy: {
       date: "desc",
     },
-  })
+  });
 
-  return logs
+  return logs;
 }
 
 export async function createEnergyLog(data: {
-  energyLevel: number
-  focusLevel: number
-  notes?: string
-  date: Date
+  energyLevel: number;
+  focusLevel: number;
+  notes?: string;
+  date: Date;
 }) {
-  const session = await getServerSession(authOptions)
+  const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    throw new Error("You must be logged in to create an energy log")
+    throw new Error("You must be logged in to create an energy log");
   }
 
   const log = await prisma.energyLog.create({
@@ -44,10 +44,9 @@ export async function createEnergyLog(data: {
       notes: data.notes,
       date: data.date,
     },
-  })
+  });
 
-  revalidatePath("/dashboard/energy")
+  revalidatePath("/dashboard/energy");
 
-  return log
+  return log;
 }
-

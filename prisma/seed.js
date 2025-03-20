@@ -336,6 +336,16 @@ async function main() {
       rating: 5,
     },
     {
+      title: "Introduction to Algorithms",
+      author: "Thomas H. Cormen",
+      type: "physical",
+      category: "Computer Science",
+      status: "reference",
+      notes: "Classic reference book for algorithms.",
+      coverImage: "/placeholder.svg?height=200&width=150",
+      dateAdded: new Date(2022, 11, 20),
+    },
+    {
       title: "Deep Work",
       author: "Cal Newport",
       type: "ebook",

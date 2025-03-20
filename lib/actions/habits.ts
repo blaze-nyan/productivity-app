@@ -1,15 +1,15 @@
-"use server"
+"use server";
 
-import { revalidatePath } from "next/cache"
-import { getServerSession } from "next-auth/next"
-import { authOptions } from "@/lib/auth"
-import prisma from "@/lib/db"
+import { revalidatePath } from "next/cache";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
+import prisma from "@/lib/db";
 
 export async function getHabits() {
-  const session = await getServerSession(authOptions)
+  const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    throw new Error("You must be logged in to view habits")
+    throw new Error("You must be logged in to view habits");
   }
 
   const habits = await prisma.habit.findMany({
@@ -26,22 +26,22 @@ export async function getHabits() {
     orderBy: {
       createdAt: "desc",
     },
-  })
+  });
 
-  return habits
+  return habits;
 }
 
 export async function createHabit(data: {
-  name: string
-  description?: string
-  category: string
-  frequency: string
-  color: string
+  name: string;
+  description?: string;
+  category: string;
+  frequency: string;
+  color: string;
 }) {
-  const session = await getServerSession(authOptions)
+  const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    throw new Error("You must be logged in to create a habit")
+    throw new Error("You must be logged in to create a habit");
   }
 
   const habit = await prisma.habit.create({
@@ -53,38 +53,38 @@ export async function createHabit(data: {
       frequency: data.frequency,
       color: data.color,
     },
-  })
+  });
 
-  revalidatePath("/dashboard/habits")
+  revalidatePath("/dashboard/habits");
 
-  return habit
+  return habit;
 }
 
 export async function toggleHabitCompletion(data: {
-  habitId: string
-  date: Date
-  completed: boolean
-  notes?: string
+  habitId: string;
+  date: Date;
+  completed: boolean;
+  notes?: string;
 }) {
-  const session = await getServerSession(authOptions)
+  const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    throw new Error("You must be logged in to update a habit")
+    throw new Error("You must be logged in to update a habit");
   }
 
   const habit = await prisma.habit.findUnique({
     where: {
       id: data.habitId,
     },
-  })
+  });
 
   if (!habit || habit.userId !== session.user.id) {
-    throw new Error("Habit not found or you don't have permission")
+    throw new Error("Habit not found or you don't have permission");
   }
 
   // Format date to remove time component for uniqueness constraint
-  const dateOnly = new Date(data.date)
-  dateOnly.setHours(0, 0, 0, 0)
+  const dateOnly = new Date(data.date);
+  dateOnly.setHours(0, 0, 0, 0);
 
   // Check if completion record exists
   const existingCompletion = await prisma.habitCompletion.findFirst({
@@ -96,7 +96,7 @@ export async function toggleHabitCompletion(data: {
         lt: new Date(dateOnly.setHours(23, 59, 59, 999)),
       },
     },
-  })
+  });
 
   if (existingCompletion) {
     // Update existing completion
@@ -108,7 +108,7 @@ export async function toggleHabitCompletion(data: {
         completed: data.completed,
         notes: data.notes,
       },
-    })
+    });
   } else {
     // Create new completion
     await prisma.habitCompletion.create({
@@ -119,29 +119,29 @@ export async function toggleHabitCompletion(data: {
         completed: data.completed,
         notes: data.notes,
       },
-    })
+    });
   }
 
-  revalidatePath("/dashboard/habits")
+  revalidatePath("/dashboard/habits");
 
-  return { success: true }
+  return { success: true };
 }
 
 export async function deleteHabit(habitId: string) {
-  const session = await getServerSession(authOptions)
+  const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    throw new Error("You must be logged in to delete a habit")
+    throw new Error("You must be logged in to delete a habit");
   }
 
   const habit = await prisma.habit.findUnique({
     where: {
       id: habitId,
     },
-  })
+  });
 
   if (!habit || habit.userId !== session.user.id) {
-    throw new Error("Habit not found or you don't have permission")
+    throw new Error("Habit not found or you don't have permission");
   }
 
   // Delete all completions first
@@ -149,17 +149,16 @@ export async function deleteHabit(habitId: string) {
     where: {
       habitId: habitId,
     },
-  })
+  });
 
   // Then delete the habit
   await prisma.habit.delete({
     where: {
       id: habitId,
     },
-  })
+  });
 
-  revalidatePath("/dashboard/habits")
+  revalidatePath("/dashboard/habits");
 
-  return { success: true }
+  return { success: true };
 }
-
